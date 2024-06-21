@@ -1,5 +1,6 @@
 import os.path
 import json
+import discord
 
 # Foxhole Discord Bot By Tuxmasku
 # Licensed under GNU
@@ -27,3 +28,6 @@ else:
     jsonData = json.dumps(tokenData)
     with open(botTokenPath, "w") as jsonFile:
         json.dump(tokenData, jsonFile)
+class MyClient(discord.Client):
+    async def on_ready(self):
+        print(f'Logged on as {self.user}')
