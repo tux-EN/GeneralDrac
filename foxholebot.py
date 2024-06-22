@@ -1,16 +1,15 @@
-import os.path
 import os
-import json
-import discord as d
-import sqlite3 as sq
-import foxfunct as ff
+import discord
+from discord.ext import commands
+from dotenv import load_dotenv
+import foxfunction as ff
 
 # Foxhole Discord Bot By Tuxmasku
 # Licensed under GNU
 # Ver 0.0.1
 
 # Constants
-botTokenPath = './json/botToken.json'
+load_dotenv()
 
 print("""
 ░██████╗░███████╗███╗░░██╗███████╗██████╗░░█████╗░██╗░░░░░██████╗░██████╗░░█████╗░░█████╗░██╗░░░██╗██╗░░░░░░█████╗░
@@ -22,13 +21,41 @@ print("""
 print("Foxhole Discord bot by Tuxmasku")
 print("Ver 0.0.1 Licensed under GPL-3.0")
 
-# Determine if token file is present and prompts user to create it if it does not exist.
-if os.path.isfile(botTokenPath) and os.access(botTokenPath, os.R_OK):
-    print("Bot Token File is present proceeding...")
-else:
-    botToken = input("Please input your bot token: ")   # requests input from user to place discord bot token
-    tokenData = {"token": botToken}
-    jsonData = json.dumps(tokenData)
-    with open(botTokenPath, "w") as jsonFile:
-        json.dump(tokenData, jsonFile)
+#pulls discord token and foxhole API link from env file
+discordToken = os.getenv("DISCORD_TOKEN")
+foxSvr = os.getenv("FOXHOLE_SERVER")
 
+#Creates a SQlite DB that stores data about items and storage
+ff.createSqliteDatabase('foxhole.db')
+
+#intializes discord client def
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'logged in as {bot.user} (ID: {bot.user.id})')
+    for guild in bot.guilds:
+        print(f'Connected to the following server: {guild.name}')
+
+#test command will remove
+@bot.command()
+async def test(ctx):
+    await ctx.send('test worked')
+
+#bot help command will add as needed
+@bot.command()
+async def gdhelp(ctx):
+    hmsg = f"""
+!test: this command tests
+!gdhelp: this command displays this
+"""
+    embed = discord.Embed(title=hmsg)
+    await ctx.author.send(embed=embed)
+    
+    
+
+bot.run(discordToken)   
