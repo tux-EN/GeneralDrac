@@ -11,7 +11,7 @@ def initstockpileDB(filename):
         print(sqlite3.sqlite_version)
         fcursor=conn.cursor()
         fcursor.execute(stocktable)
-        print("SQL Init and Table created")
+        print("DBand Tables created")
     except sqlite3.error as e:
         print(e)
     finally:

@@ -3,13 +3,12 @@ import discord
 from discord.ext import commands
 import sqlite3 as sql
 from dotenv import load_dotenv
-
-# Foxhole Discord Bot By Tuxmasku
-# Licensed under GNU
-# Ver 0.0.1
+import foxfunction as ff
 
 # Constants
 load_dotenv()
+dbName = 'foxhole.db'
+
 
 print("""
 ░██████╗░███████╗███╗░░██╗███████╗██████╗░░█████╗░██╗░░░░░██████╗░██████╗░░█████╗░░█████╗░██╗░░░██╗██╗░░░░░░█████╗░
@@ -27,16 +26,17 @@ foxSvr = os.getenv("FOXHOLE_SERVER")
 
 
 #Creates a SQlite DB that stores data about items and storage
-if not os.path.exists('fhstockpile.db'):
-    ff.initstockpileDB('fhstockpile.db')
+if not os.path.exists(dbName):
+    ff.initstockpileDB(dbName)
 
-#intializes discord client def
+#intializes discord client intents for bot
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-
+#Init bot's prefix for commands. selfs intents
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+#bot init
 @bot.event
 async def on_ready():
     print(f'logged in as {bot.user} (ID: {bot.user.id})')
@@ -51,16 +51,18 @@ async def test(ctx):
 #bot help command will add as needed
 @bot.command()
 async def gdhelp(ctx):
-    hmsg = f"""
-!test: this command tests
-!gdhelp: this command displays this
+    hmsg = f"""**Help Menu**\n
+!test: this command test function will be removed
+!gdhelp: this command displays this text
+!addstockpile: Adds stockpile to DB (Command is "!addstockpile location code")
+!liststockpile: Lists stockpiles and their codes
 """
     embed = discord.Embed(title=hmsg)
     await ctx.author.send(embed=embed)
 
 @bot.command()
 async def addstockpile(ctx, location: str, code: str):
-    conn = sql.connect('fhstockpile.db')
+    conn = sql.connect(dbName)
     cur = conn.cursor()
     cur.execute("INSERT INTO STOCKPILES (location, code) VALUES (?, ?)", (location, code))
     conn.commit()
@@ -70,7 +72,7 @@ async def addstockpile(ctx, location: str, code: str):
     
 @bot.command()
 async def liststockpile(ctx):  
-    conn = sql.connect('fhstockpile.db')
+    conn = sql.connect(dbName)
     cur = conn.cursor()
     cur.execute("SELECT * FROM STOCKPILES")
     rows = cur.fetchall()
