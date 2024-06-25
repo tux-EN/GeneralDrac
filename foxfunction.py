@@ -1,6 +1,8 @@
 import sqlite3
 
-def initstockpileDB(filename):
+dbName = 'foxhole.db'
+
+def initDB(filename):
     conn = None
     stocktable="""CREATE TABLE STOCKPILES (
         Location VARCHAR(255) NOT NULL,
@@ -17,3 +19,12 @@ def initstockpileDB(filename):
     finally:
         if conn:
             conn.close
+
+
+def addStockpile(ctx, location: str, code: str):
+    conn = sqlite3.connect(dbName)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO STOCKPILES (location, code) VALUES (?, ?)", (location, code))
+    conn.commit()
+    conn.close
+    return location
