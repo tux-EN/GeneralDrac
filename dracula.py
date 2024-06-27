@@ -1,21 +1,16 @@
-import os
 import discord
-from discord.ext import commands
-import sqlite3 as sql
-from dotenv import load_dotenv
 import foxfunction as ff
+import os
+import sqlite3 as sql
+from discord.ext import commands
+from dotenv import load_dotenv
 
 # Constants
 load_dotenv()
-dbName = 'foxhole.db'
+fox_db = 'foxhole.db'
+drac_db = 'dracula.db'
 
-print("""
-  ____                                  _             ____            _   
- |  _ \   _ __    __ _    ___   _   _  | |   __ _    | __ )    ___   | |_ 
- | | | | | '__|  / _` |  / __| | | | | | |  / _` |   |  _ \   / _ \  | __|
- | |_| | | |    | (_| | | (__  | |_| | | | | (_| |   | |_) | | (_) | | |_ 
- |____/  |_|     \__,_|  \___|  \__,_| |_|  \__,_|   |____/   \___/   \__|                                                                                                                
-""")
+
 print("Discord bot by Tuxmasku")
 print("Ver 0.1.2 Licensed under GPL-3.0")
 
@@ -25,14 +20,23 @@ discordToken = os.getenv("DISCORD_TOKEN")
 foxSvr = os.getenv("FOXHOLE_SERVER")
 
 # Creates a SQlite DB that stores data about items and storage
-if not os.path.exists(dbName):
-    ff.initDB(dbName)
+if not os.path.exists(fox_db):
+    ff.init_db(fox_db)
+    conn = sql.connect(fox_db)
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE STOCKPILES (location VARCHAR(255), code INT(6))")
+    print("Foxhole DB created")
+    conn.close()
+
+if not os.path.exists(drac_db):
+    ff.init_db(drac_db)
+    print("Dracula DB created")
 
 # initializes discord client intents for bot
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-# Init bot's prefix for commands. selfs intents
+# Init bot's prefix for commands.
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 
@@ -65,13 +69,13 @@ async def gdhelp(ctx):
 
 @bot.command()
 async def addstockpile(ctx, location: str, code: str):
-    ff.addStockpile(ctx, location, code)
+    ff.add_stockpile(ctx, location, code)
     await ctx.send(f"added '{location} to stockpile DB")
 
 
 @bot.command()
 async def liststockpile(ctx):
-    conn = sql.connect(dbName)
+    conn = sql.connect(fox_db)
     cur = conn.cursor()
     cur.execute("SELECT * FROM STOCKPILES")
     rows = cur.fetchall()
@@ -82,6 +86,5 @@ async def liststockpile(ctx):
         stockpile_list = "\n".join([f"{row[0]} - {row[1]}" for row in rows])
         await ctx.send(f"**Stockpile List:**\n{stockpile_list}")
     conn.close()
-
 
 bot.run(discordToken)
