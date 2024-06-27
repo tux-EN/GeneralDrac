@@ -1,14 +1,14 @@
 import sqlite3 as sql
 
-foxDb = 'foxhole.db'
-
+fox_db = 'foxhole.db'
+dracula_db = 'dracula.db'
 
 def init_db(filename):
     conn = None
     try:
         conn = sql.connect(filename)
         print(sql.sqlite_version)
-        print(f"{filename} DB and Tables created")
+        print(f"{filename} created")
     except sql.error as e:
         print(e)
     finally:
@@ -17,7 +17,7 @@ def init_db(filename):
 
 
 def add_stockpile(ctx, location: str, code: str):
-    conn = sql.connect(foxDb)
+    conn = sql.connect(fox_db)
     cur = conn.cursor()
     cur.execute("INSERT INTO STOCKPILES (location, code) VALUES (?, ?)", (location, code))
     conn.commit()
