@@ -11,9 +11,9 @@ class SteamSale(commands.Cog):
     @commands.command()
     async def steamsale(self, ctx):
         url = "https://store.steampowered.com/api/featuredcategories"
-        response = rq.get(url)
-        data = response.json()
-
+        res = rq.get(url)
+        data = res.json()
+        print(res.json())
 
 async def setup(bot):
     await bot.add_cog(SteamSale(bot))

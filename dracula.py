@@ -1,34 +1,38 @@
-import discord
-import foxfunction as ff
 import os
 import sqlite3 as sql
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-#Init Variables
+#  Variables for the bot
+cogs: list = ["cogs.steamsale", "cogs.foxhole", "cogs.general"]
+load_dotenv()
 fox_db = 'foxhole.db'
-dracula_db = 'dracula.db'
-conn = None
-cogs: list = ["cogs.steamsale", "cogs.foxhole"]
 
 print("Discord bot by Tuxmasku")
 print("Ver 0.2.0 Licensed under GPL-3.0")
 
-# pulls discord token and foxhole API link from env file
-
+#  Function that initializes a SQLite DB
+def init_db(filename):
+    conn = None
+    try:
+        conn = sql.connect(filename)
+        print(sql.sqlite_version)
+        print(f"{filename} created")
+    except sql.error as e:
+        print(e)
+    finally:
+        if conn:
+            conn.close()
 
 # Creates a SQlite DB that stores data about items and storage
 if not os.path.exists(fox_db):
-    ff.init_db(fox_db)
+    init_db(fox_db)
     conn = sql.connect(fox_db)
     cur = conn.cursor()
     cur.execute("CREATE TABLE STOCKPILES (location VARCHAR(255), code INT(6))")
-    print("Foxhole DB created")
     conn.close()
 
-if not os.path.exists(dracula_db):
-    ff.init_db(dracula_db)
-    print("Dracula DB created")
 
 # initializes discord client intents
 intents = discord.Intents.default()
@@ -53,9 +57,6 @@ class bot(commands.Bot):
 #  On ready event that prints the bot's name to confirm token
     async def on_ready(self) -> None:
         print(f"Logged in as {self.user}")
-
-#loads env file
-load_dotenv()
 
 bot = bot()
 bot.run(os.getenv("DISCORD_TOKEN"))

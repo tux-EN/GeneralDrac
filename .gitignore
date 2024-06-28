@@ -3,3 +3,13 @@
 .idea/modules.xml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
+
+__pycache__/foxfunction.cpython-310.pyc
+
+__pycache__/foxfunction.cpython-312.pyc
+
+cogs/__pycache__/foxhole.cpython-312.pyc
+
+cogs/__pycache__/general.cpython-312.pyc
+
+cogs/__pycache__/steamsale.cpython-312.pyc
